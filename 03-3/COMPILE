@@ -1,0 +1,1 @@
+g++ -Wall -pedantic -ggdb -LC:/msys64/mingw64/lib clkinputman.cpp clkterminator.cpp clkinputtrigger.cpp clktiming.cpp main.cpp -lopengl32 -lglu32 -lglew32 -DGLEW_STATIC -Dmain=SDL_main -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_image
