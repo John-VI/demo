@@ -2,8 +2,8 @@ SRCDIR=src
 OBJDIR=obj
 
 CPP=g++
-CPPFLAGS=-Wall -pedantic -ggdb -I$(SRCDIR) -std=c++20 -IC:/msys64/mingw64/include/SDL2 -Dmain=SDL_main
-LDFLAGS=-LC:/msys64/mingw64/lib -lopengl32 -lglu32 -lglew32 -DGLEW_STATIC -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_image
+CPPFLAGS=-Wall -pedantic -ggdb -I$(SRCDIR) -std=c++20 -D_REENTRANT -fext-numeric-literals
+LDFLAGS=-lGL -lGLU -lGLEW -DGLEW_STATIC -lSDL2main -lSDL2 -lSDL2_image
 
 _DEPS=clkgl.h clkinputman.h clkinputtrigger.h clkkeybind.h clkmbuttonbind.h clkrand.h clkterminator.h clktextureman.h clktiming.h clkviewport.h clkwin.h
 DEPS=$(patsubst %,$(SRCDIR)/%,$(_DEPS))
@@ -20,4 +20,4 @@ $(OBJ): $(OBJDIR)/%.o: src/%.cpp $(DEPS)
 .PHONY: clean
 
 clean:
-	rm -f $(OBJDIR)/*\.o 05.exe
+	rm -f $(OBJDIR)/*\.o 05
