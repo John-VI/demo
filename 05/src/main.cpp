@@ -70,14 +70,15 @@ void main()
 })glsl";
 
 const float vertices[] = {
-    -0.5f, 0.5f,  0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-    0.5f,  0.5f,  0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-    0.5f,  -0.5f, 0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, 0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+     0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+     0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+    -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 };
 
 const GLuint elements[] = {
-    0, 1, 2, 2, 3, 0
+    0, 1, 2,
+    0, 2, 3
 };
 
 extern "C"
@@ -168,7 +169,7 @@ int main (int argc, char *argv[]) {
 	GLint unitime = glGetUniformLocation(shaderprogram, "time");
 	GLint unishade = glGetUniformLocation(shaderprogram, "shade");
 
-	GLfloat darkshade[4] = { 0.2, 0.2, 0.2, 1.0 };
+	GLfloat darkshade[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glUniform4fv(unishade, 1, darkshade);
 
 	clk::textureman texman;
@@ -190,16 +191,15 @@ int main (int argc, char *argv[]) {
   	Uint32 mseconds = 0;
 
   	glm::mat4 trans = glm::mat4(1.0f);
-  	glm::mat4 ortproj = glm::ortho<float>(0.0f, INTWID, INTHEI, 0.0f);
+  	glm::mat4 ortproj = glm::ortho<float>(0.0f, INTWID, INTHEI, 0.0f, 0.0f, 1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 
-	glUniformMatrix4fv(uniproj, 1, GL_FALSE, glm::value_ptr(perproj));
 	glUniformMatrix4fv(uniview, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(uniproj, 1, GL_FALSE, glm::value_ptr(ortproj));
 	glUniform1i(uniwarp, 1);
 	glUniform1ui(unitime, 0);
 
 	std::cout << glm::to_string(ortproj) << std::endl;
-	std::cout << glm::to_string(perproj) << std::endl;
 
 	Uint32 elapsedtime = 0;
 
@@ -229,19 +229,20 @@ int main (int argc, char *argv[]) {
 
 		win.clear();
 
-		trans = glm::scale(glm::mat4(1.0), glm::vec3(11, 11, 11));
+		trans = glm::translate(glm::mat4(1.0f), glm::vec3(INTWID / 2.0f, INTHEI / 2.0f, 0.0f));
+		trans = glm::scale(trans, glm::vec3(300.0f, -300.0f, 1.0f));
 		glUniformMatrix4fv(unimodel, 1, GL_FALSE, glm::value_ptr(trans));
-		glUniform1ui(uniwarp, true);
+		glUniform1ui(uniwarp, false);
 
 		glDrawElements(GL_TRIANGLES, 3 * 2, GL_UNSIGNED_INT, 0);
 		
 		glDisable(GL_DEPTH_TEST);
 
-		trans = glm::scale(glm::mat4(1.0), glm::vec3(1, 1, 1));
+		trans = glm::mat4(1.0);
 		glUniformMatrix4fv(unimodel, 1, GL_FALSE, glm::value_ptr(trans));
 		glUniform1ui(uniwarp, false);
 
-		glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3 * 2, GL_UNSIGNED_INT, 0);
 
 		win.draw();
 
