@@ -6,10 +6,10 @@
 #include <array>
 #include <iostream>
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_Surface.h>
+#include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_opengl.h>
 
 namespace clk {

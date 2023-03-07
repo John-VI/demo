@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <array>
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace clk {
 
