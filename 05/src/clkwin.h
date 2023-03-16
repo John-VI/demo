@@ -28,7 +28,7 @@ class window {
 
 public:
   window(const char name[], int width, int height, const SDL_Color *color);
-  
+
   void setcolor(const SDL_Color *newcolor);
   SDL_Window *getSDL_Window();
   SDL_GLContext *getSDL_GLContext();

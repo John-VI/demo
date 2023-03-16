@@ -11,7 +11,7 @@ void clk::terminator::quittrig::trigger(const SDL_Event &e) {
 
 clk::terminator::quittrig::~quittrig() {}
 
-clk::terminator::terminator() {finished = false;};
+clk::terminator::terminator() { finished = false; };
 
 void clk::terminator::managerreg(inputman *man) {
   if (manager) {

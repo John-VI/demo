@@ -18,7 +18,6 @@ clk::sprite::sprite(window &ren, const char filename[])
   if (!surface)
     throw std::runtime_error(std::string(IMG_GetError()));
 
-
   int w, h;
   query(nullptr, nullptr, &w, &h);
   sheetoffset = {0, 0, w, h};

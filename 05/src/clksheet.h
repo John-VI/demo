@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "clktex.h"
+#include "clktextureman.h"
 
 namespace clk {
 
@@ -25,6 +25,8 @@ struct frameinfo {
 
 class sheet : public sprite {
 private:
+  texturehandle tex;
+
   inline int calcfx(const frameinfo &f, int frame);
   inline int calcfy(const frameinfo &f, int frame);
 

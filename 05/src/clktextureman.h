@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <array>
+#include <unordered_map>
+#include <vector>
 
 #include <GL/glew.h>
 
@@ -18,11 +19,14 @@ class textureman {
   friend class texturehandle;
 
 public:
-  textureman();
+  textureman(GLint unisection);
 
   texturehandle requestTexture(textureid);
   inline bool hasTexture(textureid id) { return textures.contains((int)id); }
   void enableTexture(const texturehandle &);
+  void setSprite(const texturehandle &, int sheet, int sprite);
+
+  static const GLfloat defaultsection[4] = {0.0f, 0.0f, 1.0f, 1.0f};
 
 protected:
   texture *getTexture(int id);
@@ -32,13 +36,21 @@ protected:
 
   std::unordered_map<int, texture> textures;
   textureid activetex;
+  const GLint unisection;
 
   static const std::array<const char *, (int)textureid::MAX> texfilenames;
 };
 
+struct sheetinfo {
+  int xoffset, yoffset;
+  int xpadding, ypadding;
+  int w, h;
+  int count, cols;
+};
 
 struct texture {
-  texture(GLuint tex, const int id);
+  texture(GLuint tex, const int id, int w, int h);
+
   texture &operator=(texture &&other);
   texture(texture &&other);
 
@@ -51,9 +63,16 @@ struct texture {
   int culling = 0;
   bool live = true;
 
-  ~texture();
-};
+  std::vector<const sheetinfo> spritesheets;
 
+  inline int getw() const { return w; }
+  inline int geth() const { return h; }
+
+  ~texture();
+
+private:
+  int w, h;
+};
 
 struct texturehandle {
   friend class textureman;
@@ -63,11 +82,14 @@ struct texturehandle {
   texturehandle &operator=(texturehandle &&other);
   texturehandle(texturehandle &&other);
 
-  //texturehandle &operator=(const texturehandle &other);
-  //texturehandle(const texturehandle &other);
+  // texturehandle &operator=(const texturehandle &other);
+  // texturehandle(const texturehandle &other);
 
   inline bool live() const { return man->hasTexture((textureid)ref); }
   inline void enable() { man->enableTexture(*this); }
+  inline void setSprite(int sheet, int frame) {
+    man->setSprite(*this, sheet, frame);
+  }
 
   inline void decrefcount() {
     if (man && --man->getTexture(ref)->refs <= 0)
@@ -81,4 +103,4 @@ private:
   textureman *man = nullptr;
 };
 
-}
+} // namespace clk

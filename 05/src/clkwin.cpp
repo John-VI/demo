@@ -15,7 +15,7 @@ using namespace clk;
 
 clk::window::window(const char name[], int width, int height,
                     const SDL_Color *color)
-  : color(color) {
+    : color(color) {
 
   SDL_Init(SDL_INIT_VIDEO);
 
@@ -24,9 +24,8 @@ clk::window::window(const char name[], int width, int height,
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-  win =
-      SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                       width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+  win = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                         width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
   if (win == nullptr)
     throw std::runtime_error(
         std::string({"Failed to initialize SDL window: ", SDL_GetError()}));
@@ -46,16 +45,15 @@ clk::window::~window() {
   SDL_DestroyWindow(win);
 }
 
-void clk::window::setcolor(const SDL_Color *newcolor) {
-  color = newcolor;
-}
+void clk::window::setcolor(const SDL_Color *newcolor) { color = newcolor; }
 
 SDL_Window *clk::window::getSDL_Window() { return win; }
 
 SDL_GLContext *clk::window::getSDL_GLContext() { return &glcontext; }
 
 void clk::window::clear() {
-  glClearColor(color->r / 255.0f, color->g / 255.0f, color->b / 255.0f, color->a / 255.0f);
+  glClearColor(color->r / 255.0f, color->g / 255.0f, color->b / 255.0f,
+               color->a / 255.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void clk::window::draw() { SDL_GL_SwapWindow(win); }

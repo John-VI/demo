@@ -36,8 +36,8 @@ void clk::menubuild::ktrigger(const SDL_Event &e, double *val) {
 
 void clk::menubuild::kmanagerreg() {
   if (kbound) {
-    //messages::push({"Already registered with manager.", severitylevel::DEV,
-    //                devlevel::DEV, 0});
+    // messages::push({"Already registered with manager.", severitylevel::DEV,
+    //                 devlevel::DEV, 0});
     return;
   }
   kmanager.registerinput((SDL_Keycode)pair.first,

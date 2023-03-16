@@ -25,8 +25,8 @@ void clk::keybind::trigger(const SDL_Event &e) {
 
 void clk::keybind::managerreg(inputman *man) {
   if (manager) {
-    //messages::push({"Already registered with manager.", severitylevel::DEV,
-    //                devlevel::DEV, 0});
+    // messages::push({"Already registered with manager.", severitylevel::DEV,
+    //                 devlevel::DEV, 0});
     return;
   }
   manager = man;
