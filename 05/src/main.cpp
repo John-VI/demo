@@ -45,8 +45,8 @@ const char *vertshadeglsl = R"glsl(
     {
         gl_Position = proj * view * model * vec4(position, 1.0);
         fragcolor = color;
-        fragtexcoord = vec2(texcoord.x * section.w + section.x, 
-			texcoord.y * section.h + section.y);
+        fragtexcoord = vec2(texcoord.x * section.z + section.x, 
+			texcoord.y * section.w + section.y);
     }
 )glsl";
 
@@ -101,6 +101,24 @@ struct texktrig : public clk::inputtrigger {
   }
 };
 
+int shaderError(GLuint shader) {
+	GLint compiled = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+
+	if (compiled == GL_FALSE) {
+		GLint maxlength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxlength);
+
+		std::vector<GLchar> errorlog(maxlength);
+		glGetShaderInfoLog(shader, maxlength, &maxlength, &errorlog[0]);
+
+		printf("%s\n", errorlog.data());
+
+		return 1;
+	}
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
   SDL_Color black = {0, 0, 255, 0};
   clk::window win("04", INTWID, INTHEI, &black);
@@ -127,9 +145,26 @@ int main(int argc, char *argv[]) {
   glShaderSource(vertexshader, 1, &vertshadeglsl, NULL);
   glCompileShader(vertexshader);
 
+  if (shaderError(vertexshader)) {
+  	glDeleteShader(vertexshader);
+  	glDeleteBuffers(1, &VBO);
+  	glDeleteVertexArrays(1, &VAO);
+
+  	return 5;
+  }
+
   GLuint fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragmentshader, 1, &fragshadeglsl, NULL);
   glCompileShader(fragmentshader);
+
+  if (shaderError(vertexshader)) {
+  	glDeleteShader(vertexshader);
+  	glDeleteShader(fragmentshader);
+  	glDeleteBuffers(1, &VBO);
+  	glDeleteVertexArrays(1, &VAO);
+
+  	return 6;
+  }
 
   GLuint shaderprogram = glCreateProgram();
   glAttachShader(shaderprogram, vertexshader);
@@ -174,7 +209,7 @@ int main(int argc, char *argv[]) {
   GLfloat darkshade[4] = {1.0f, 1.0f, 1.0f, 1.0f};
   glUniform4fv(unishade, 1, darkshade);
 
-  clk::textureman texman;
+  clk::textureman texman(unisection);
 
   SDL_GL_SetSwapInterval(1);
 
@@ -212,6 +247,8 @@ int main(int argc, char *argv[]) {
                                 texman.requestTexture(clk::textureid::FROG)));
   handles.insert(std::make_pair(clk::textureid::READ,
                                 texman.requestTexture(clk::textureid::READ)));
+  handles.insert(std::make_pair(clk::textureid::FONT,
+  								texman.requestTexture(clk::textureid::FONT)));
 
   while (!term.end()) {
     framedelta.start();

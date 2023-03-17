@@ -10,7 +10,7 @@
 
 namespace clk {
 
-enum class textureid { UNDEF, FROG, READ, MAX };
+enum class textureid { UNDEF, FROG, READ, FONT, MAX };
 
 struct texture;
 struct texturehandle;
@@ -26,7 +26,7 @@ public:
   void enableTexture(const texturehandle &);
   void setSprite(const texturehandle &, int sheet, int sprite);
 
-  static const GLfloat defaultsection[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+  static constexpr GLfloat defaultsection[4] = {0.0f, 0.0f, 1.0f, 1.0f};
 
 protected:
   texture *getTexture(int id);
@@ -63,7 +63,7 @@ struct texture {
   int culling = 0;
   bool live = true;
 
-  std::vector<const sheetinfo> spritesheets;
+  std::vector<sheetinfo> spritesheets;
 
   inline int getw() const { return w; }
   inline int geth() const { return h; }

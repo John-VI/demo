@@ -17,7 +17,7 @@
 namespace clk {
 
 const std::array<const char *, (int)textureid::MAX> textureman::texfilenames{
-    {"undef.png", "frog.png", "reading.png"}};
+    {"undef.png", "frog.png", "reading.png", "compac.png"}};
 
 texturehandle::texturehandle(texture &t, textureman *m) : man(m) {
   t.refs++;
@@ -133,6 +133,9 @@ texture textureman::loadTexture(textureid id) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, convsurf->w, convsurf->h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, convsurf->pixels);
 
+  int w = convsurf->w;
+  int h = convsurf->h;
+
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -141,7 +144,7 @@ texture textureman::loadTexture(textureid id) {
   SDL_FreeSurface(preconvsurf);
   SDL_FreeSurface(convsurf);
 
-  return texture(gltex, (int)id);
+  return texture(gltex, (int)id, w, h);
 }
 
 void textureman::enableTexture(const texturehandle &handle) {
@@ -157,7 +160,7 @@ void textureman::enableTexture(const texturehandle &handle) {
   glUniform4fv(unisection, 1, defaultsection);
 }
 
-void textureman::setSprite(const texturehandle &handle, int sheet, int sprite) {
+void textureman::setSprite(const texturehandle &handle, int sheetid, int sprite) {
   if (handle.ref != (int)activetex || !handle.live())
     return;
 
@@ -166,7 +169,7 @@ void textureman::setSprite(const texturehandle &handle, int sheet, int sprite) {
   const sheetinfo *sheet;
 
   try {
-    sheet = tex.spritesheets.at(sheet);
+    sheet = &tex.spritesheets.at(sheetid);
   } catch (std::out_of_range) {
     glUniform4fv(unisection, 1, defaultsection);
     return;
@@ -175,10 +178,10 @@ void textureman::setSprite(const texturehandle &handle, int sheet, int sprite) {
   sprite = sprite % sheet->count;
 
   GLfloat section[4] = {(sheet->xoffset + sheet->w * (sprite % sheet->cols) +
-                         sheet.xpadding * (sprite % sheet->cols + 1)) /
+                         sheet->xpadding * (sprite % sheet->cols + 1)) /
                             tex.getw(),
                         (sheet->yoffset + sheet->h * (sprite / sheet->cols) +
-                         sheet.ypadding * (sprite / sheet->cols + 1)) /
+                         sheet->ypadding * (sprite / sheet->cols + 1)) /
                             tex.geth(),
                         sheet->w / tex.getw(), sheet->h / tex.geth()};
 
