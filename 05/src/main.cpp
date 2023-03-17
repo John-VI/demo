@@ -8,6 +8,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <string.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,6 +20,7 @@
 #include "clkinputtrigger.h"
 #include "clkkeybind.h"
 #include "clkterminator.h"
+#include "clktextgrid.h"
 #include "clktextureman.h"
 #include "clktiming.h"
 #include "clkwin.h"
@@ -101,22 +103,32 @@ struct texktrig : public clk::inputtrigger {
   }
 };
 
+struct typetrig : public clk::inputtrigger {
+  typetrig(clk::textgrid &g) : g(g) {}
+
+  void trigger(const SDL_Event &e) override {
+    g.text.push_back(e.key.keysym.sym);
+  }
+
+  clk::textgrid &g;
+};
+
 int shaderError(GLuint shader) {
-	GLint compiled = 0;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+  GLint compiled = 0;
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 
-	if (compiled == GL_FALSE) {
-		GLint maxlength = 0;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxlength);
+  if (compiled == GL_FALSE) {
+    GLint maxlength = 0;
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxlength);
 
-		std::vector<GLchar> errorlog(maxlength);
-		glGetShaderInfoLog(shader, maxlength, &maxlength, &errorlog[0]);
+    std::vector<GLchar> errorlog(maxlength);
+    glGetShaderInfoLog(shader, maxlength, &maxlength, &errorlog[0]);
 
-		printf("%s\n", errorlog.data());
+    printf("%s\n", errorlog.data());
 
-		return 1;
-	}
-	return 0;
+    return 1;
+  }
+  return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -146,11 +158,11 @@ int main(int argc, char *argv[]) {
   glCompileShader(vertexshader);
 
   if (shaderError(vertexshader)) {
-  	glDeleteShader(vertexshader);
-  	glDeleteBuffers(1, &VBO);
-  	glDeleteVertexArrays(1, &VAO);
+    glDeleteShader(vertexshader);
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
 
-  	return 5;
+    return 5;
   }
 
   GLuint fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -158,12 +170,12 @@ int main(int argc, char *argv[]) {
   glCompileShader(fragmentshader);
 
   if (shaderError(vertexshader)) {
-  	glDeleteShader(vertexshader);
-  	glDeleteShader(fragmentshader);
-  	glDeleteBuffers(1, &VBO);
-  	glDeleteVertexArrays(1, &VAO);
+    glDeleteShader(vertexshader);
+    glDeleteShader(fragmentshader);
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
 
-  	return 6;
+    return 6;
   }
 
   GLuint shaderprogram = glCreateProgram();
@@ -219,7 +231,7 @@ int main(int argc, char *argv[]) {
   term.managerreg(&iman);
 
   clk::keybind kbd;
-  kbd.managerreg(&iman);
+  // kbd.managerreg(&iman);
 
   std::shared_ptr<texktrig> txk = std::make_unique<texktrig>();
   kbd.registerinput(SDLK_0, txk);
@@ -248,7 +260,17 @@ int main(int argc, char *argv[]) {
   handles.insert(std::make_pair(clk::textureid::READ,
                                 texman.requestTexture(clk::textureid::READ)));
   handles.insert(std::make_pair(clk::textureid::FONT,
-  								texman.requestTexture(clk::textureid::FONT)));
+                                texman.requestTexture(clk::textureid::FONT)));
+
+  clk::textgrid tgrid(texman.requestTexture(clk::textureid::FONT), INTWID,
+                      INTHEI, unimodel);
+
+  std::shared_ptr<typetrig> tyk = std::make_unique<typetrig>(tgrid);
+  iman.registerinput(SDL_KEYDOWN, tyk);
+
+  tgrid.text.push_back('f');
+  tgrid.text.push_back('u');
+  tgrid.text.push_back('d');
 
   while (!term.end()) {
     framedelta.start();
@@ -286,6 +308,8 @@ int main(int argc, char *argv[]) {
     glUniform1ui(uniwarp, false);
 
     glDrawElements(GL_TRIANGLES, 3 * 2, GL_UNSIGNED_INT, 0);
+
+    tgrid.draw();
 
     win.draw();
 

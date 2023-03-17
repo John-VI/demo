@@ -18,7 +18,10 @@ public:
 
   std::vector<char> text;
 
-  void setDimensions(int newwidth, int newheight);
+  void inline setDimensions(int newwidth, int newheight) {
+    intwid = newwidth;
+    inthei = newheight;
+  }
   void draw() const;
 
 private:
@@ -28,3 +31,5 @@ private:
 
   const GLint unimodel;
 };
+
+} // namespace clk

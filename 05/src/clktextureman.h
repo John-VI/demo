@@ -86,8 +86,8 @@ struct texturehandle {
   // texturehandle(const texturehandle &other);
 
   inline bool live() const { return man->hasTexture((textureid)ref); }
-  inline void enable() { man->enableTexture(*this); }
-  inline void setSprite(int sheet, int frame) {
+  inline void enable() const { man->enableTexture(*this); }
+  inline void setSprite(int sheet, int frame) const {
     man->setSprite(*this, sheet, frame);
   }
 

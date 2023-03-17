@@ -10,13 +10,12 @@ namespace clk {
 
 class scrtextbuffer {
 public:
-	
-	std::vector<char> buff;
-	void resetScreenSize(int newwidth, int newheight);
+  std::vector<char> buff;
+  void resetScreenSize(int newwidth, int newheight);
 
 private:
-	texturehandle font;
-	int intwid, inthei;
+  texturehandle font;
+  int intwid, inthei;
 };
 
-}
+} // namespace clk

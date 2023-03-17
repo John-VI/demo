@@ -3,6 +3,7 @@
 #include "clktextureman.h"
 
 #include <array>
+#include <cstdio>
 #include <iostream>
 #include <unordered_map>
 
@@ -66,7 +67,10 @@ texturehandle::texturehandle(const texturehandle &other) {
 */
 
 texture::texture(GLuint tex, const int id, int w, int h)
-    : tex(tex), id(id), w(w), h(h){};
+    : tex(tex), id(id), w(w), h(h) {
+  // FIXME: Replace this stupid spritesheet hack when adding proper loading.
+  spritesheets.push_back({0, 0, 0, 0, 8, 16, 96, 96});
+}
 
 texture &texture::operator=(texture &&other) {
   if (this != &other) {
@@ -76,6 +80,7 @@ texture &texture::operator=(texture &&other) {
     std::swap(culling, other.culling);
     std::swap(w, other.w);
     std::swap(h, other.h);
+    std::swap(spritesheets, other.spritesheets);
     other.live = false;
   }
 
@@ -160,30 +165,33 @@ void textureman::enableTexture(const texturehandle &handle) {
   glUniform4fv(unisection, 1, defaultsection);
 }
 
-void textureman::setSprite(const texturehandle &handle, int sheetid, int sprite) {
+void textureman::setSprite(const texturehandle &handle, int sheetid,
+                           int sprite) {
   if (handle.ref != (int)activetex || !handle.live())
     return;
 
   const texture &tex = textures.at((int)handle.ref);
 
-  const sheetinfo *sheet;
+  sheetinfo sheet;
 
   try {
-    sheet = &tex.spritesheets.at(sheetid);
+    sheet = tex.spritesheets.at(sheetid);
   } catch (std::out_of_range) {
     glUniform4fv(unisection, 1, defaultsection);
+    // std::cerr << tex.spritesheets.size() << std::endl;
     return;
   }
 
-  sprite = sprite % sheet->count;
+  sprite = sprite % sheet.count;
 
-  GLfloat section[4] = {(sheet->xoffset + sheet->w * (sprite % sheet->cols) +
-                         sheet->xpadding * (sprite % sheet->cols + 1)) /
-                            tex.getw(),
-                        (sheet->yoffset + sheet->h * (sprite / sheet->cols) +
-                         sheet->ypadding * (sprite / sheet->cols + 1)) /
-                            tex.geth(),
-                        sheet->w / tex.getw(), sheet->h / tex.geth()};
+  GLfloat section[4] = {
+      (sheet.xoffset + (float)sheet.w * (sprite % sheet.cols) +
+       sheet.xpadding * (sprite % sheet.cols + 1)) /
+          tex.getw(),
+      (sheet.yoffset + (float)sheet.h * (sprite / sheet.cols + 1) +
+       sheet.ypadding * (sprite / sheet.cols + 1)) /
+          tex.geth(),
+      (float)sheet.w / tex.getw(), -(float)sheet.h / tex.geth()};
 
   glUniform4fv(unisection, 1, section);
 }
