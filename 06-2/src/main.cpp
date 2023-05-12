@@ -25,6 +25,8 @@
 #include "clktiming.h"
 #include "clkwin.h"
 
+#include "player.h"
+
 #define INTWID 640
 #define INTHEI 640
 
@@ -270,17 +272,20 @@ int main(int argc, char *argv[]) {
   tgrid.text.push_back('u');
   tgrid.text.push_back('d');
 
-  std::shared_ptr<clk::inputtrigger> turntrig = std::make_shared<clk::inputtrigger>([&view] (auto &e) {
-    std::cout << "Move" << std::endl;
-    if (e.key.keysym.sym == SDLK_LEFT)
-      view = glm::rotate(view, glm::radians(.5f), glm::vec3(0, 1, 0));
-    else
-      view = glm::rotate(view, glm::radians(-.5f), glm::vec3(0, 1, 0));
-      }
-    );
+  // std::shared_ptr<clk::inputtrigger> turntrig = std::make_shared<clk::inputtrigger>([&view] (auto &e) {
+  //   std::cout << "Move" << std::endl;
+  //   if (e.key.keysym.sym == SDLK_LEFT)
+  //     view = glm::rotate(view, glm::radians(.5f), glm::vec3(0, 1, 0));
+  //   else
+  //     view = glm::rotate(view, glm::radians(-.5f), glm::vec3(0, 1, 0));
+  //     }
+  //   );
 
-  kbd.registerinput(SDLK_LEFT, turntrig);
-  kbd.registerinput(SDLK_RIGHT, turntrig);
+  // kbd.registerinput(SDLK_LEFT, turntrig);
+  // kbd.registerinput(SDLK_RIGHT, turntrig);
+
+  player p(glm::mat4(1.0f), uniview);
+  p.managerreg(&kbd);
 
   while (!term.end()) {
     framedelta.start();
@@ -299,11 +304,11 @@ int main(int argc, char *argv[]) {
 
     texman.enableTexture(handles.at(clk::textureid::READ));
 
+    p.updateview();
+
     glEnable(GL_DEPTH_TEST);
 
     win.clear();
-
-    glUniformMatrix4fv(uniview, 1, GL_FALSE, glm::value_ptr(view));
 
     glUniformMatrix4fv(uniproj, 1, GL_FALSE, glm::value_ptr(perproj));
     // trans = glm::translate(glm::mat4(1.0f),
